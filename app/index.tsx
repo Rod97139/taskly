@@ -50,13 +50,15 @@ export default function App() {
       if (item.id === id) {
         return {
           ...item,
-          completedAtTimestamp: item.completedAtTimestamp ? undefined : Date.now(),
+          completedAtTimestamp: item.completedAtTimestamp
+            ? undefined
+            : Date.now(),
         };
       }
       return item;
     });
     setShoppingList(newShoppingList);
-  }
+  };
   return (
     <FlatList
       data={shoppingList}
@@ -94,7 +96,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    padding: 12,
+    paddingVertical: 12,
   },
   contentContainer: {
     paddingBottom: 24,

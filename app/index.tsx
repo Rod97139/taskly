@@ -1,7 +1,10 @@
 import { FlatList, StyleSheet, Text, TextInput, View } from "react-native";
 import { ShoppingListItem } from "../components/ShoppingListItem";
 import { theme } from "../theme";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getFromStorage, saveToStorage } from "../utils/storage";
+
+const storageKey = "shopping-list";
 
 type ShoppingListItemType = {
   id: string;
@@ -34,18 +37,37 @@ export default function App() {
   const [value, setValue] = useState("");
   const [shoppingList, setShoppingList] =
     useState<ShoppingListItemType[]>(initialList);
+
+  useEffect(() => {
+    const fetchInitialList = async () => {
+      const data = await getFromStorage(storageKey);
+      data && setShoppingList(data);
+    };
+    fetchInitialList();
+  }, []);
+
   const handleSubmit = () => {
     if (value) {
-      setShoppingList([
-        { id: Date.now().toString(), name: value, lastUpdatedTimestamp: Date.now() },
+      const newShoppingList = [
+        {
+          id: Date.now().toString(),
+          name: value,
+          lastUpdatedTimestamp: Date.now(),
+        },
         ...shoppingList,
-      ]);
+      ];
+      saveToStorage(storageKey, newShoppingList);
+      setShoppingList(newShoppingList);
       setValue("");
     }
   };
+
   const handleDelete = (id: string) => {
-    setShoppingList(shoppingList.filter((item) => item.id !== id));
+    const newShoppingList = shoppingList.filter((item) => item.id !== id);
+    saveToStorage(storageKey, newShoppingList);
+    setShoppingList(newShoppingList);
   };
+
   const handleToggleComplete = (id: string) => {
     const newShoppingList = shoppingList.map((item) => {
       if (item.id === id) {
@@ -59,8 +81,10 @@ export default function App() {
       }
       return item;
     });
+    saveToStorage(storageKey, newShoppingList);
     setShoppingList(newShoppingList);
   };
+
   return (
     <FlatList
       data={orderShoppingList(shoppingList)}
@@ -114,8 +138,7 @@ const orderShoppingList = (shoppingList: ShoppingListItemType[]) => {
 
     return 0;
   });
-}
-
+};
 
 const styles = StyleSheet.create({
   container: {

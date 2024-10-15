@@ -43,8 +43,7 @@ type ShoppingListItemType = {
 
 export default function App() {
   const [value, setValue] = useState("");
-  const [shoppingList, setShoppingList] =
-    useState<ShoppingListItemType[]>([]);
+  const [shoppingList, setShoppingList] = useState<ShoppingListItemType[]>([]);
 
   useEffect(() => {
     const fetchInitialList = async () => {

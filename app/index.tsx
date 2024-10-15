@@ -7,26 +7,27 @@ type ShoppingListItemType = {
   id: string;
   name: string;
   completedAtTimestamp?: number;
+  lastUpdatedTimestamp: number;
 };
 
 const initialList: ShoppingListItemType[] = [
-  { id: "1", name: "Coffee" },
-  { id: "2", name: "Tea" },
-  { id: "3", name: "Sugar" },
-  { id: "4", name: "Milk" },
-  { id: "5", name: "Bread" },
-  { id: "6", name: "Butter" },
-  { id: "7", name: "Eggs" },
-  { id: "8", name: "Cheese" },
-  { id: "9", name: "Yogurt" },
-  { id: "10", name: "Juice" },
-  { id: "11", name: "Fruit" },
-  { id: "12", name: "Vegetables" },
-  { id: "13", name: "Meat" },
-  { id: "14", name: "Fish" },
-  { id: "15", name: "Pasta" },
-  { id: "16", name: "Rice" },
-  { id: "17", name: "Beans" },
+  { id: "1", name: "Coffee", lastUpdatedTimestamp: Date.now() },
+  { id: "2", name: "Tea", lastUpdatedTimestamp: Date.now() },
+  { id: "3", name: "Sugar", lastUpdatedTimestamp: Date.now() },
+  { id: "4", name: "Milk", lastUpdatedTimestamp: Date.now() },
+  { id: "5", name: "Bread", lastUpdatedTimestamp: Date.now() },
+  { id: "6", name: "Butter", lastUpdatedTimestamp: Date.now() },
+  { id: "7", name: "Eggs", lastUpdatedTimestamp: Date.now() },
+  { id: "8", name: "Cheese", lastUpdatedTimestamp: Date.now() },
+  { id: "9", name: "Yogurt", lastUpdatedTimestamp: Date.now() },
+  { id: "10", name: "Juice", lastUpdatedTimestamp: Date.now() },
+  { id: "11", name: "Fruit", lastUpdatedTimestamp: Date.now() },
+  { id: "12", name: "Vegetables", lastUpdatedTimestamp: Date.now() },
+  { id: "13", name: "Meat", lastUpdatedTimestamp: Date.now() },
+  { id: "14", name: "Fish", lastUpdatedTimestamp: Date.now() },
+  { id: "15", name: "Pasta", lastUpdatedTimestamp: Date.now() },
+  { id: "16", name: "Rice", lastUpdatedTimestamp: Date.now() },
+  { id: "17", name: "Beans", lastUpdatedTimestamp: Date.now() },
 ];
 
 export default function App() {
@@ -36,7 +37,7 @@ export default function App() {
   const handleSubmit = () => {
     if (value) {
       setShoppingList([
-        { id: Date.now().toString(), name: value },
+        { id: Date.now().toString(), name: value, lastUpdatedTimestamp: Date.now() },
         ...shoppingList,
       ]);
       setValue("");
@@ -50,6 +51,7 @@ export default function App() {
       if (item.id === id) {
         return {
           ...item,
+          lastUpdatedTimestamp: Date.now(),
           completedAtTimestamp: item.completedAtTimestamp
             ? undefined
             : Date.now(),
@@ -61,7 +63,7 @@ export default function App() {
   };
   return (
     <FlatList
-      data={shoppingList}
+      data={orderShoppingList(shoppingList)}
       style={styles.container}
       contentContainerStyle={styles.contentContainer}
       stickyHeaderIndices={[0]}
@@ -91,6 +93,29 @@ export default function App() {
     />
   );
 }
+
+const orderShoppingList = (shoppingList: ShoppingListItemType[]) => {
+  return shoppingList.sort((item1, item2) => {
+    if (item1.completedAtTimestamp && item2.completedAtTimestamp) {
+      return item2.completedAtTimestamp - item1.completedAtTimestamp;
+    }
+
+    if (item1.completedAtTimestamp && !item2.completedAtTimestamp) {
+      return 1;
+    }
+
+    if (!item1.completedAtTimestamp && item2.completedAtTimestamp) {
+      return -1;
+    }
+
+    if (!item1.completedAtTimestamp && !item2.completedAtTimestamp) {
+      return item2.lastUpdatedTimestamp - item1.lastUpdatedTimestamp;
+    }
+
+    return 0;
+  });
+}
+
 
 const styles = StyleSheet.create({
   container: {

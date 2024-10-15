@@ -2,11 +2,42 @@ import { Text, View, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { theme } from "../../theme";
 import { registerForPushNotificationsAsync } from "../../utils/registerForPushNotificationsAsync";
 import * as Notifications from "expo-notifications";
+import { useEffect, useState } from "react";
+import { Duration, intervalToDuration, isBefore } from "date-fns";
+
+// 10 seconds from now
+const timestamp = Date.now() + 10 * 1000;
+
+type CountdownStatus = {
+  isOverdue: boolean;
+  distance: Duration;
+};
 
 export default function CounterScreen() {
+  const [status, setStatus] = useState<CountdownStatus>({
+    isOverdue: false,
+    distance: {},
+  });
+
+  console.log("status", status);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const isOverdue = isBefore(timestamp, Date.now());
+      const distance = intervalToDuration(
+        isOverdue
+          ? { start: timestamp, end: Date.now() }
+          : { start: Date.now(), end: timestamp },
+      );
+      setStatus({ isOverdue, distance });
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
   const scheduleNotification = async () => {
     const result = await registerForPushNotificationsAsync();
-    
+
     if (result === "granted") {
       console.log("result", result);
       await Notifications.scheduleNotificationAsync({
@@ -16,7 +47,6 @@ export default function CounterScreen() {
         trigger: {
           seconds: 5,
         },
-        
       });
     } else {
       Alert.alert(

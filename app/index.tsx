@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, TextInput, View } from "react-native";
+import { FlatList, StyleSheet, Text, TextInput, View } from "react-native";
 import { ShoppingListItem } from "../components/ShoppingListItem";
 import { theme } from "../theme";
 import { useState } from "react";
@@ -9,9 +9,23 @@ type ShoppingListItemType = {
 };
 
 const initialList: ShoppingListItemType[] = [
-  { id: "1", name: "Coffee" },
-  { id: "2", name: "Tea" },
-  { id: "3", name: "Sugar" },
+  // { id: "1", name: "Coffee" },
+  // { id: "2", name: "Tea" },
+  // { id: "3", name: "Sugar" },
+  // { id: "4", name: "Milk" },
+  // { id: "5", name: "Bread" },
+  // { id: "6", name: "Butter" },
+  // { id: "7", name: "Eggs" },
+  // { id: "8", name: "Cheese" },
+  // { id: "9", name: "Yogurt" },
+  // { id: "10", name: "Juice" },
+  // { id: "11", name: "Fruit" },
+  // { id: "12", name: "Vegetables" },
+  // { id: "13", name: "Meat" },
+  // { id: "14", name: "Fish" },
+  // { id: "15", name: "Pasta" },
+  // { id: "16", name: "Rice" },
+  // { id: "17", name: "Beans" },
 ];
 
 export default function App() {
@@ -28,23 +42,28 @@ export default function App() {
     }
   };
   return (
-    <ScrollView 
-      style={styles.container} 
+    <FlatList
+      data={shoppingList}
+      style={styles.container}
       contentContainerStyle={styles.contentContainer}
       stickyHeaderIndices={[0]}
-    >
-      <TextInput
-        style={styles.textInput}
-        placeholder="Add a new item"
-        value={value}
-        onChangeText={setValue}
-        returnKeyType="done"
-        onSubmitEditing={handleSubmit}
-      />
-      {shoppingList.map((item) => (
-        <ShoppingListItem name={item.name} key={item.id} />
-      ))}
-    </ScrollView>
+      ListEmptyComponent={
+        <View style={styles.listEmptyContainer}>
+          <Text>Your shopping list is empty</Text>
+        </View>
+      }
+      ListHeaderComponent={
+        <TextInput
+          value={value}
+          style={styles.textInput}
+          onChangeText={setValue}
+          placeholder="E.g Coffee"
+          onSubmitEditing={handleSubmit}
+          returnKeyType="done"
+        />
+      }
+      renderItem={({ item }) => <ShoppingListItem name={item.name} />}
+    />
   );
 }
 
@@ -66,5 +85,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     borderRadius: 50,
     backgroundColor: theme.colorWhite,
+  },
+  listEmptyContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: 18,
   },
 });

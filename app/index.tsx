@@ -6,26 +6,27 @@ import { useState } from "react";
 type ShoppingListItemType = {
   id: string;
   name: string;
+  completedAtTimestamp?: number;
 };
 
 const initialList: ShoppingListItemType[] = [
-  // { id: "1", name: "Coffee" },
-  // { id: "2", name: "Tea" },
-  // { id: "3", name: "Sugar" },
-  // { id: "4", name: "Milk" },
-  // { id: "5", name: "Bread" },
-  // { id: "6", name: "Butter" },
-  // { id: "7", name: "Eggs" },
-  // { id: "8", name: "Cheese" },
-  // { id: "9", name: "Yogurt" },
-  // { id: "10", name: "Juice" },
-  // { id: "11", name: "Fruit" },
-  // { id: "12", name: "Vegetables" },
-  // { id: "13", name: "Meat" },
-  // { id: "14", name: "Fish" },
-  // { id: "15", name: "Pasta" },
-  // { id: "16", name: "Rice" },
-  // { id: "17", name: "Beans" },
+  { id: "1", name: "Coffee" },
+  { id: "2", name: "Tea" },
+  { id: "3", name: "Sugar" },
+  { id: "4", name: "Milk" },
+  { id: "5", name: "Bread" },
+  { id: "6", name: "Butter" },
+  { id: "7", name: "Eggs" },
+  { id: "8", name: "Cheese" },
+  { id: "9", name: "Yogurt" },
+  { id: "10", name: "Juice" },
+  { id: "11", name: "Fruit" },
+  { id: "12", name: "Vegetables" },
+  { id: "13", name: "Meat" },
+  { id: "14", name: "Fish" },
+  { id: "15", name: "Pasta" },
+  { id: "16", name: "Rice" },
+  { id: "17", name: "Beans" },
 ];
 
 export default function App() {
@@ -41,6 +42,21 @@ export default function App() {
       setValue("");
     }
   };
+  const handleDelete = (id: string) => {
+    setShoppingList(shoppingList.filter((item) => item.id !== id));
+  };
+  const handleToggleComplete = (id: string) => {
+    const newShoppingList = shoppingList.map((item) => {
+      if (item.id === id) {
+        return {
+          ...item,
+          completedAtTimestamp: item.completedAtTimestamp ? undefined : Date.now(),
+        };
+      }
+      return item;
+    });
+    setShoppingList(newShoppingList);
+  }
   return (
     <FlatList
       data={shoppingList}
@@ -62,7 +78,14 @@ export default function App() {
           returnKeyType="done"
         />
       }
-      renderItem={({ item }) => <ShoppingListItem name={item.name} />}
+      renderItem={({ item }) => (
+        <ShoppingListItem
+          name={item.name}
+          onDelete={() => handleDelete(item.id)}
+          onToggleComplete={() => handleToggleComplete(item.id)}
+          isCompleted={!!item.completedAtTimestamp} // !! converts to boolean
+        />
+      )}
     />
   );
 }

@@ -1,4 +1,11 @@
-import { Text, View, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
+import {
+  Text,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import { theme } from "../../theme";
 import { registerForPushNotificationsAsync } from "../../utils/registerForPushNotificationsAsync";
 import * as Notifications from "expo-notifications";
@@ -10,9 +17,9 @@ import { getFromStorage, saveToStorage } from "../../utils/storage";
 // 10 seconds from now
 const frequency = 10 * 1000;
 
-const countdownStorageKey = "taskly-countdown";
+export const countdownStorageKey = "taskly-countdown";
 
-type PersistedCountdownState = {
+export type PersistedCountdownState = {
   currentNotificationId: string | undefined;
   completedAtTimestamps: number[];
 };
@@ -46,7 +53,7 @@ export default function CounterScreen() {
       const timestamp = lastCompletedAtTimestamp
         ? lastCompletedAtTimestamp + frequency
         : Date.now();
-      (lastCompletedAtTimestamp || !countdownState ) && setIsLoading(false);
+      (lastCompletedAtTimestamp || !countdownState) && setIsLoading(false);
       const isOverdue = isBefore(timestamp, Date.now());
       const distance = intervalToDuration(
         isOverdue
@@ -57,6 +64,7 @@ export default function CounterScreen() {
     }, 1000);
 
     return () => clearInterval(intervalId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastCompletedAtTimestamp]);
 
   const scheduleNotification = async () => {
@@ -86,10 +94,10 @@ export default function CounterScreen() {
 
     const newCountdownState: PersistedCountdownState = {
       currentNotificationId: pushNotificationId,
-      completedAtTimestamps: countdownState 
+      completedAtTimestamps: countdownState
         ? [Date.now(), ...countdownState.completedAtTimestamps]
         : [Date.now()],
-    }
+    };
     setCountdownState(newCountdownState);
     saveToStorage(countdownStorageKey, newCountdownState);
   };
@@ -99,7 +107,7 @@ export default function CounterScreen() {
       <View style={styles.activityIndicatorContainer}>
         <ActivityIndicator color={theme.colorBlack} />
       </View>
-    )
+    );
 
   return (
     <View
@@ -200,5 +208,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     flex: 1,
-  }
+  },
 });

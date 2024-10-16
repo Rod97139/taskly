@@ -5,17 +5,20 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  useWindowDimensions,
 } from "react-native";
 import { theme } from "../../theme";
 import { registerForPushNotificationsAsync } from "../../utils/registerForPushNotificationsAsync";
 import * as Notifications from "expo-notifications";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Duration, intervalToDuration, isBefore } from "date-fns";
 import { TimeSegment } from "../../components/TimeSegment";
 import { getFromStorage, saveToStorage } from "../../utils/storage";
+import * as Haptics from "expo-haptics";
+import ConfettiCannon from "react-native-confetti-cannon";
 
-// 10 seconds from now
-const frequency = 10 * 1000;
+// 2 days from now
+const frequency = 2 * 24 * 60 * 60 * 1000;
 
 export const countdownStorageKey = "taskly-countdown";
 
@@ -30,6 +33,8 @@ type CountdownStatus = {
 };
 
 export default function CounterScreen() {
+  const { width } = useWindowDimensions();
+  const confettiRef = useRef<any>();
   const [isLoading, setIsLoading] = useState(true);
   const [countdownState, setCountdownState] =
     useState<PersistedCountdownState>();
@@ -68,13 +73,14 @@ export default function CounterScreen() {
   }, [lastCompletedAtTimestamp]);
 
   const scheduleNotification = async () => {
+    confettiRef?.current?.start();
     let pushNotificationId;
     const result = await registerForPushNotificationsAsync();
 
     if (result === "granted") {
       pushNotificationId = await Notifications.scheduleNotificationAsync({
         content: {
-          title: "The thing is due!",
+          title: "Time to do your sport session!",
         },
         trigger: {
           seconds: frequency / 1000,
@@ -100,6 +106,7 @@ export default function CounterScreen() {
     };
     setCountdownState(newCountdownState);
     saveToStorage(countdownStorageKey, newCountdownState);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
 
   if (isLoading)
@@ -132,7 +139,7 @@ export default function CounterScreen() {
             status.isOverdue ? styles.whiteText : undefined,
           ]}
         >
-          Things due in...
+          Sport session due in...
         </Text>
       )}
       <View style={styles.row}>
@@ -162,8 +169,15 @@ export default function CounterScreen() {
         style={styles.button}
         activeOpacity={0.8}
       >
-        <Text style={styles.buttonText}>I've done the thing!</Text>
+        <Text style={styles.buttonText}>I've done the session!</Text>
       </TouchableOpacity>
+      <ConfettiCannon
+        ref={confettiRef}
+        count={50}
+        origin={{ x: width / 2, y: -30 }}
+        autoStart={false}
+        fadeOut={true}
+      />
     </View>
   );
 }
